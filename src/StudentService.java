@@ -49,4 +49,34 @@ public class StudentService {
         return resultExecuted;
     }
 
+    public Map<Object, Object> updateStudent(Student student) {
+        Map<Object, Object> resultExecuted = new HashMap<>();
+        String query = "UPDATE students SET name = ?, student_code = ?, age = ?, address = ?, sex = ? WHERE id = ?";
+
+        try (Connection connection = DBConnection.getConnection()) {
+            PreparedStatement stmt = connection.prepareStatement(query); {
+
+                stmt.setString(1, student.getName());
+                stmt.setLong(2, student.getStudentCode());
+                stmt.setInt(3, student.getAge());
+                stmt.setString(4, student.getAddress());
+                stmt.setString(5, student.getSex());
+                stmt.setString(6, student.getId().toString());
+            }
+
+            int rowAffected = stmt.executeUpdate();
+            if(rowAffected > 0) {
+                resultExecuted.put("Noti", "Successfully updated student");
+                logger.info("Student updated: " + student);
+            } else {
+                resultExecuted.put("Noti", "Failed to update student, ID may not exist");
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to update student: ", e);
+            resultExecuted.put("error", e.getMessage());
+        }
+        return resultExecuted;
+    }
+
 }
