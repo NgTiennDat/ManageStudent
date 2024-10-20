@@ -1,14 +1,12 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class StudentService {
+public class StudentManager {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     public void printStudent(Student student) {
@@ -17,6 +15,30 @@ public class StudentService {
 
     public void viewListStudent(List<Student> students) {
         students.forEach(this::printStudent);
+    }
+
+    public Map<Object, Object> getAllStudents() {
+        Map<Object, Object> resultExecuted = new HashMap<>();
+        String query = "SELECT * FROM students";
+        try (Connection connection = DBConnection.getConnection()) {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                UUID id = UUID.fromString(rs.getString("id"));
+                String name = rs.getString("name");
+                long studentCode = rs.getLong("student_code");
+                int age = rs.getInt("age");
+                String address = rs.getString("address");
+                String sex = rs.getString("sex");
+
+                Student student = new Student(id, name, studentCode, age, address, sex);
+                resultExecuted.put(id, student);
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to fetch students: ", e);
+            e.printStackTrace();
+        }
+        return resultExecuted;
     }
 
     public Map<Object, Object> addStudent(Student student) {
