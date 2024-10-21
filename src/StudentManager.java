@@ -101,26 +101,27 @@ public class StudentManager {
         return resultExecuted;
     }
 
-    public Map<Object, Object> deleteStudent(Student student) {
+    public Map<Object, Object> deleteStudent(UUID id) {
         Map<Object, Object> resultExecuted = new HashMap<>();
         String query = "DELETE FROM students WHERE id = ?";
 
         try (Connection connection = DBConnection.getConnection()) {
-            PreparedStatement stmt = connection.prepareStatement(query); {
-                stmt.setString(1, student.getId().toString());
-                int rowAffected = stmt.executeUpdate();
-                if(rowAffected > 0) {
-                    resultExecuted.put("Noti", "Successfully deleted student");
-                    logger.info("Student deleted: " + student);
-                } else {
-                    resultExecuted.put("Noti", "Failed to delete student");
-                }
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, id.toString());
+
+            int rowAffected = stmt.executeUpdate();
+            if (rowAffected > 0) {
+                resultExecuted.put("Noti", "Successfully deleted student");
+                logger.info("Student deleted: ID = " + id);
+            } else {
+                resultExecuted.put("Noti", "Failed to delete student, ID may not exist");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to delete student: ", e);
             resultExecuted.put("error", e.getMessage());
         }
         return resultExecuted;
     }
+
 
 }

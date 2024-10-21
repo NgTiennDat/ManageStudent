@@ -35,7 +35,7 @@ public class StudentUI {
                     updateStudentUI();
                     break;
                 case "4":
-//                    deleteStudentUI();
+                    deleteStudentUI();
                     break;
                 case "5":
                     running = false;
@@ -115,5 +115,22 @@ public class StudentUI {
         Map<Object, Object> result = manager.updateStudent(student);
         System.out.println(result.get("Noti"));
     }
+
+    public void deleteStudentUI() {
+        System.out.print("Enter Student ID to Delete: ");
+        String idStr = scanner.nextLine();
+        UUID id;
+
+        try {
+            id = UUID.fromString(idStr);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid UUID format.");
+            return;
+        }
+
+        Map<Object, Object> result = manager.deleteStudent(id);
+        System.out.println(result.get("Noti"));
+    }
+
 
 }
