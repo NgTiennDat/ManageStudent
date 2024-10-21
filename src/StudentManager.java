@@ -101,4 +101,26 @@ public class StudentManager {
         return resultExecuted;
     }
 
+    public Map<Object, Object> deleteStudent(Student student) {
+        Map<Object, Object> resultExecuted = new HashMap<>();
+        String query = "DELETE FROM students WHERE id = ?";
+
+        try (Connection connection = DBConnection.getConnection()) {
+            PreparedStatement stmt = connection.prepareStatement(query); {
+                stmt.setString(1, student.getId().toString());
+                int rowAffected = stmt.executeUpdate();
+                if(rowAffected > 0) {
+                    resultExecuted.put("Noti", "Successfully deleted student");
+                    logger.info("Student deleted: " + student);
+                } else {
+                    resultExecuted.put("Noti", "Failed to delete student");
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to delete student: ", e);
+            resultExecuted.put("error", e.getMessage());
+        }
+        return resultExecuted;
+    }
+
 }
