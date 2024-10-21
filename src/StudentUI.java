@@ -1,19 +1,17 @@
-import java.util.Map;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class StudentUI {
     private final StudentManager manager;
-    private final Scanner scanner;
+    private final Scanner scanner = new Scanner(System.in);
 
     public StudentUI(StudentManager manager) {
         this.manager = manager;
-        this.scanner = new Scanner(System.in);
     }
 
     public void displayMenu() {
         boolean running = true;
-
         while (running) {
             System.out.println("=== STUDENT MANAGEMENT SYSTEM ===");
             System.out.println("1. Add Student");
@@ -23,114 +21,80 @@ public class StudentUI {
             System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
 
-            String choice = scanner.nextLine();
-            switch (choice) {
-                case "1":
-                    addStudentUI();
-                    break;
-                case "2":
-                    showStudentsUI();
-                    break;
-                case "3":
-                    updateStudentUI();
-                    break;
-                case "4":
-                    deleteStudentUI();
-                    break;
-                case "5":
+            switch (scanner.nextLine()) {
+                case "1" -> addStudentUI();
+                case "2" -> showStudentsUI();
+                case "3" -> updateStudentUI();
+                case "4" -> deleteStudentUI();
+                case "5" -> {
                     running = false;
                     System.out.println("Exiting... Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                }
+                default -> System.out.println("Invalid choice. Please try again.");
             }
         }
     }
 
-    public void addStudentUI() {
-        System.out.println("Enter Student Name: ");
-        String name = scanner.nextLine();
-
-        System.out.println("Enter Student Code: ");
-        long studentCode = scanner.nextLong();
-        scanner.nextLine();
-
-        System.out.println("Enter Student age: ");
-        int age = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.println("Enter Student address: ");
-        String address = scanner.nextLine();
-
-        System.out.println("Enter Student Sex: ");
-        String sex = scanner.nextLine();
-
-        UUID id = UUID.randomUUID();
-        Student student = new Student(id, name, studentCode, age, address, sex);
-        Map<Object, Object> result = manager.addStudent(student);
-        System.out.println(result.get("Noti"));
+    private void addStudentUI() {
+        Student student = inputStudentData(UUID.randomUUID());
+        String result = manager.addStudent(student);
+        System.out.println(result);
     }
 
-    public void showStudentsUI() {
-        Map<Object, Object> students = manager.getAllStudents();
-
-        if(students.isEmpty()) {
-            System.out.println("No students found");
+    private void showStudentsUI() {
+        List<Student> students = manager.getAllStudents();
+        if (students.isEmpty()) {
+            System.out.println("No students found.");
         } else {
-            students.forEach((id, student) -> {
-               System.out.println(student);
-            });
+            students.forEach(System.out::println);
         }
     }
+
     private void updateStudentUI() {
         System.out.print("Enter Student ID to Update: ");
-        String idStr = scanner.nextLine();
-        UUID id;
+        UUID id = inputUUID();
+        if (id == null) return;
 
+        Student student = inputStudentData(id);
+        String result = manager.updateStudent(student);
+        System.out.println(result);
+    }
+
+    private void deleteStudentUI() {
+        System.out.print("Enter Student ID to Delete: ");
+        UUID id = inputUUID();
+        if (id == null) return;
+
+        String result = manager.deleteStudent(id);
+        System.out.println(result);
+    }
+
+    private UUID inputUUID() {
         try {
-            id = UUID.fromString(idStr);
+            return UUID.fromString(scanner.nextLine());
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid UUID format.");
-            return;
+            return null;
         }
+    }
 
-        System.out.print("Enter New Name: ");
+    private Student inputStudentData(UUID id) {
+        System.out.print("Enter Student Name: ");
         String name = scanner.nextLine();
 
-        System.out.print("Enter New Student Code: ");
+        System.out.print("Enter Student Code: ");
         long studentCode = scanner.nextLong();
-        scanner.nextLine(); // Consume newline
 
-        System.out.print("Enter New Age: ");
+        System.out.print("Enter Student Age: ");
         int age = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
-        System.out.print("Enter New Address: ");
+        System.out.print("Enter Student Address: ");
         String address = scanner.nextLine();
 
-        System.out.print("Enter New Sex: ");
+        System.out.print("Enter Student Sex: ");
         String sex = scanner.nextLine();
 
-        Student student = new Student(id, name, studentCode, age, address, sex);
-        Map<Object, Object> result = manager.updateStudent(student);
-        System.out.println(result.get("Noti"));
+        return new Student(id, name, studentCode, age, address, sex);
     }
-
-    public void deleteStudentUI() {
-        System.out.print("Enter Student ID to Delete: ");
-        String idStr = scanner.nextLine();
-        UUID id;
-
-        try {
-            id = UUID.fromString(idStr);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid UUID format.");
-            return;
-        }
-
-        Map<Object, Object> result = manager.deleteStudent(id);
-        System.out.println(result.get("Noti"));
-    }
-
-
 }
