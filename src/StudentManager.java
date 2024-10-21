@@ -52,6 +52,16 @@ public class StudentManager {
     }
 
     public String updateStudent(Student student) {
+        if (student.getId() == null) {
+            return "Student id is null";
+        }
+        if(student.getName() == null || student.getName().isEmpty()) {
+            return "Student name is null";
+        }
+        if(student.getAge() < 0) {
+            return "Student age is negative";
+        }
+
         String query = "UPDATE students SET name = ?, student_code = ?, age = ?, address = ?, sex = ? WHERE id = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -84,4 +94,11 @@ public class StudentManager {
             return "Error: " + e.getMessage();
         }
     }
+
+    public List<Student> sortStudentByName() {
+        List<Student> students = this.getAllStudents();
+        students.sort(Comparator.comparing(Student::getName).reversed());
+        return students;
+    }
+
 }

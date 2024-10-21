@@ -18,7 +18,8 @@ public class StudentUI {
             System.out.println("2. Show All Students");
             System.out.println("3. Edit Student");
             System.out.println("4. Delete Student");
-            System.out.println("5. Exit");
+            System.out.println("5. Show sorted students");
+            System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
             switch (scanner.nextLine()) {
@@ -26,7 +27,8 @@ public class StudentUI {
                 case "2" -> showStudentsUI();
                 case "3" -> updateStudentUI();
                 case "4" -> deleteStudentUI();
-                case "5" -> {
+                case "5" -> sortStudentByNameUI();
+                case "0" -> {
                     running = false;
                     System.out.println("Exiting... Goodbye!");
                 }
@@ -46,6 +48,17 @@ public class StudentUI {
         if (students.isEmpty()) {
             System.out.println("No students found.");
         } else {
+            students.forEach(System.out::println);
+        }
+    }
+
+    private void sortStudentByNameUI() {
+        List<Student> students = manager.sortStudentByName();
+
+        if(students.isEmpty()) {
+            System.out.println("No students found.");
+        } else {
+            System.out.println("--- Sort student by name ---");
             students.forEach(System.out::println);
         }
     }
